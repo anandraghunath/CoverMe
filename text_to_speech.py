@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from TTS.api import TTS
+import uvicorn
+
 
 app = FastAPI()
 
@@ -13,5 +15,4 @@ def speak(text: str):
     return FileResponse(audio_path, media_type="audio/wav")
 
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run("text_to_speech:app", host="127.0.0.1", port=8000, reload=True)
