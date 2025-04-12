@@ -125,6 +125,6 @@ if __name__ == "__main__":
 
     # Simulate conversation
     process_transcript_segment(ctx, "Trump is currently president right now right?", speaker="Other")
-    process_transcript_segment(ctx, "Sorry, I didn’t mean it that way.", speaker="User")
-    process_transcript_segment(ctx, "Okay… I just need some space.", speaker="Other")
-    process_transcript_segment(ctx, "Do you want to talk later?", speaker="User", mode="Friendly")
+    process_transcript_segment(ctx, "Who cares?", speaker="User")
+    process_transcript_segment(ctx, "Okay… I just wanted to know bro.", speaker="Other")
+    process_transcript_segment(ctx, "Wanna discuss this later?", speaker="User", mode="Friendly")
