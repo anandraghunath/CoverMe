@@ -5,3 +5,7 @@ transformers
 torch
 openai
 google-generativeai
+whisper
+sounddevice
+numpy
+scipy
