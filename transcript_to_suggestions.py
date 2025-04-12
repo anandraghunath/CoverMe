@@ -5,6 +5,7 @@ from typing import List, Optional
 import google.generativeai as genai
 from dotenv import load_dotenv
 from transformers import pipeline
+from text_to_speech import speak
 
 # --- Load API Key from .env ---
 load_dotenv()
@@ -117,6 +118,8 @@ def process_transcript_segment(ctx: ContextWindow, new_text: str, speaker: str =
     print(f"🎭 Detected Emotion: {emotion} ({emotion_score:.2f})")
     print(f"💬 Suggestion Source: {source}")
     print(f"✅ Suggested Response: {response}")
+    speak(response)
+    
 
 # --- Example Usage ---
 
