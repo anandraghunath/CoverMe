@@ -1,14 +1,25 @@
+import os
 import time
 from typing import List, Optional
-import openai
+
+import google.generativeai as genai
+from dotenv import load_dotenv
 from transformers import pipeline
 
-# Initialize APIs
-openai.api_key = "your-api-key-here"  # Replace this with your env-based key setup
+# --- Load API Key from .env ---
+load_dotenv()
+gemini_api_key = os.getenv("GEMINI_API_KEY")
+
+if not gemini_api_key:
+    raise Exception("GEMINI_API_KEY not found in environment variables.")
+
+genai.configure(api_key=gemini_api_key)
+
+# --- Sentiment & Emotion Analyzers ---
 sentiment_analyzer = pipeline("sentiment-analysis")
 emotion_analyzer = pipeline("text-classification", model="j-hartmann/emotion-english-distilroberta-base", top_k=1)
 
-# --- Context Block Manager ---
+# --- Context Manager Classes ---
 
 class ContextBlock:
     def __init__(self, text: str, speaker: str = "unknown", timestamp: Optional[float] = None):
@@ -40,12 +51,11 @@ class ContextWindow:
     def clear(self):
         self.blocks = []
 
-
 # --- Emotion + Sentiment + Rule-Based Fallback ---
 
 def analyze_emotion(text: str):
     sentiment = sentiment_analyzer(text)[0]
-    emotion = emotion_analyzer(text)[0]
+    emotion = emotion_analyzer(text)[0][0]
     return sentiment['label'], sentiment['score'], emotion['label'], emotion['score']
 
 def fallback_response(emotion_label: str):
@@ -59,48 +69,50 @@ def fallback_response(emotion_label: str):
     }
     return responses.get(emotion_label.lower(), "Thanks for sharing. Can you tell me more?")
 
-# --- GPT-4 Suggestion Generator ---
+# --- Gemini Suggestion Generator ---
 
-def generate_suggestion(context_text: str, mode: str = "Friendly") -> str:
-    system_prompt = f"You are a {mode.lower()} conversational assistant. Based on the recent conversation, suggest one helpful or clever response the user could say next."
-
+def generate_suggestion_with_gemini(context_text: str, mode: str = "Friendly") -> str:
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4-turbo",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Conversation:\n{context_text}\n\nSuggestion:"}
-            ],
-            temperature=0.8,
-            max_tokens=50
+        model = genai.GenerativeModel(model_name="models/gemini-1.5-pro-latest")
+        prompt = (
+            f"You are a highly adaptive conversational assistant who helps users respond "
+            f"intelligently, empathetically, or playfully during real-time conversations.\n\n"
+            f"Your response style should match the selected mode: '{mode}' — adjust your tone accordingly:\n"
+            f"- Witty: use clever, light humor or wordplay\n"
+            f"- Friendly: sound warm, casual, and approachable\n"
+            f"- Charming: be engaging and thoughtful, with emotional intelligence\n"
+            f"- Networking: be professional, relevant, and rapport-building\n\n"
+            f"Given the following conversation so far, suggest one short but helpful response the user could say next.\n\n"
+            f"Conversation:\n{context_text}\n\n"
+            f"Suggested Next Line:"
         )
-        return response["choices"][0]["message"]["content"].strip()
+        response = model.generate_content(prompt)
+        return response.text.strip()
     except Exception as e:
-        print(f"[LLM Error]: {e}")
+        print(f"[Gemini Error]: {e}")
         return None
 
-
-# --- Master Function ---
+# --- Master Processor ---
 
 def process_transcript_segment(ctx: ContextWindow, new_text: str, speaker: str = "Other", mode: str = "Witty"):
     ctx.add(new_text, speaker)
-
     context_text = ctx.get_context_as_text()
     sentiment, sentiment_score, emotion, emotion_score = analyze_emotion(new_text)
 
-    # Check emotion and decide: fallback or LLM
+    # Fallback for negative emotions
     if emotion.lower() in ["anger", "disgust", "fear", "sadness"]:
         response = fallback_response(emotion)
         source = "Fallback"
     else:
-        response = generate_suggestion(context_text, mode=mode)
+        response = generate_suggestion_with_gemini(context_text, mode)
         if response:
-            source = "LLM"
+            source = "Gemini"
         else:
             response = fallback_response(emotion)
-            source = "Fallback (LLM Failed)"
+            source = "Fallback (Gemini Failed)"
 
     print(f"\n🎤 Speaker: {speaker}")
+    print(f"\nText: {new_text}")
     print(f"🧠 Detected Sentiment: {sentiment} ({sentiment_score:.2f})")
     print(f"🎭 Detected Emotion: {emotion} ({emotion_score:.2f})")
     print(f"💬 Suggestion Source: {source}")
@@ -111,8 +123,8 @@ def process_transcript_segment(ctx: ContextWindow, new_text: str, speaker: str =
 if __name__ == "__main__":
     ctx = ContextWindow(max_blocks=5)
 
-    # Simulate a live feed
-    process_transcript_segment(ctx, "I can't believe you'd say that. Whatever.", speaker="Other")
+    # Simulate conversation
+    process_transcript_segment(ctx, "Trump is currently president right now right?", speaker="Other")
     process_transcript_segment(ctx, "Sorry, I didn’t mean it that way.", speaker="User")
     process_transcript_segment(ctx, "Okay… I just need some space.", speaker="Other")
     process_transcript_segment(ctx, "Do you want to talk later?", speaker="User", mode="Friendly")
