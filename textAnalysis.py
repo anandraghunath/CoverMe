@@ -1,5 +1,6 @@
 import transformers
 from transformers import pipeline
+import torch
 
 # Load sentiment and emotion detection pipelines
 sentiment_analyzer = pipeline("sentiment-analysis")
@@ -10,7 +11,7 @@ def analyze_and_respond(text):
     sentiment = sentiment_analyzer(text)[0]
     emotion = emotion_analyzer(text)[0]
 
-    label = emotion['label']
+    label = emotion[0]['label']
     response = ""
 
     # Basic rule-based response suggestion
@@ -30,7 +31,7 @@ def analyze_and_respond(text):
     # Output result
     print(f"Original Message: {text}")
     print(f"Detected Sentiment: {sentiment['label']} ({sentiment['score']:.2f})")
-    print(f"Detected Emotion: {label} ({emotion['score']:.2f})")
+    print(f"Detected Emotion: {label} ({emotion[0]['score']:.2f})")
     print(f"Suggested Response: {response}")
 
 # Example usage
