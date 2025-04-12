@@ -5,7 +5,7 @@ from typing import List, Optional
 import google.generativeai as genai
 from dotenv import load_dotenv
 from transformers import pipeline
-from text_to_speech import speak
+#from text_to_speech import speak
 
 # --- Load API Key from .env ---
 load_dotenv()
@@ -78,12 +78,8 @@ def generate_suggestion_with_gemini(context_text: str, mode: str = "Friendly") -
         prompt = (
             f"You are a highly adaptive conversational assistant who helps users respond "
             f"intelligently, empathetically, or playfully during real-time conversations.\n\n"
-            f"Your response style should match the selected mode: '{mode}' — adjust your tone accordingly:\n"
-            f"- Witty: use clever, light humor or wordplay\n"
-            f"- Friendly: sound warm, casual, and approachable\n"
-            f"- Charming: be engaging and thoughtful, with emotional intelligence\n"
-            f"- Networking: be professional, relevant, and rapport-building\n\n"
-            f"Given the following conversation so far, suggest one short but helpful response the user could say next.\n\n"
+            f"Given the following conversation so far, suggest one short but helpful response the user could say in response."
+            f"For example, if a person was getting yelled at, you should give a suggestion like 'I suggest you confirm their feelings and explain how you feel as well to better communicate'\n\n"
             f"Conversation:\n{context_text}\n\n"
             f"Suggested Next Line:"
         )
@@ -118,7 +114,7 @@ def process_transcript_segment(ctx: ContextWindow, new_text: str, speaker: str =
     print(f"🎭 Detected Emotion: {emotion} ({emotion_score:.2f})")
     print(f"💬 Suggestion Source: {source}")
     print(f"✅ Suggested Response: {response}")
-    speak(response)
+    #speak(response)
     
 
 # --- Example Usage ---

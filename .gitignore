@@ -2,3 +2,4 @@ __pycache__/text_to_speech.cpython-311.pyc
 output_*.wav
 .env
 output.wav
+node_modules 
