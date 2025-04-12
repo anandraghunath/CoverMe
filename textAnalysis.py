@@ -35,5 +35,5 @@ def analyze_and_respond(text):
     print(f"Suggested Response: {response}")
 
 # Example usage
-input_text = "I can't believe you'd say that. Whatever."
-analyze_and_respond(input_text)
+input_text = "I love you!"
+analyze_and_respond(input("What is the message?\n"))
