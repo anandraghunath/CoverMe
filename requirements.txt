@@ -4,3 +4,4 @@ TTS
 transformers
 torch
 openai
+google-generativeai
