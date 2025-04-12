@@ -1,7 +1,7 @@
 fastapi
 uvicorn
 coqui-tts
-tts
+TTS
 transformers
 torch
 openai
