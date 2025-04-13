@@ -71,7 +71,7 @@ def get_voiceprint_and_transcribe(audio_data):
     print("💬 Transcribing with Whisper...")
     result = whisper_model.transcribe(wav_path)
     print("\n🗣️ Other speaker:", result["text"])
-    process_transcript_segment(model_manager.ctx, result)
+    process_transcript_segment(model_manager.ctx, result["text"])
 
 def listen_and_run():
     print("🎧 Listening... Press Ctrl+C to stop.")

@@ -4,3 +4,5 @@ output_*.wav
 output.wav
 node_modules 
 __pycache__/model_manager.cpython-311.pyc
+__pycache__/model_manager.cpython-311.pyc
+__pycache__/transcript_to_suggestions.cpython-311.pyc
