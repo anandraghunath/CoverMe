@@ -6,3 +6,26 @@ node_modules
 __pycache__/model_manager.cpython-311.pyc
 __pycache__/model_manager.cpython-311.pyc
 __pycache__/transcript_to_suggestions.cpython-311.pyc
+
+# === Model and training outputs ===
+*.pt
+*.bin
+*.ckpt
+
+# Tokenizer and corpus artifacts
+data/corpus.txt
+tokenizer/custom_tokenizer.json
+
+# Hugging Face model cache
+.cache/
+datasets/
+**/models--*/
+**/wav2vec2_checkpoints/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# IDE/project metadata
+.idea/
+.vscode/
