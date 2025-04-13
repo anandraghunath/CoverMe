@@ -52,6 +52,18 @@ for epoch in range(EPOCHS):
     loop = tqdm(loader, desc=f"Epoch {epoch+1}")
     for batch in loop:
         inputs, targets = [b.to(DEVICE) for b in batch]
-        outputs = model(inputs)  # shape: (batch, seq, vocab)
+        outputs = model(inputs)  # (batch, seq_len, vocab_size)
 
-        # reshape for loss: (batch
+        loss = loss_fn(outputs.view(-1, vocab_size), targets.view(-1))
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        total_loss += loss.item()
+        loop.set_postfix(loss=loss.item())
+
+# ====== SAVE MODEL ======
+os.makedirs("model/checkpoints", exist_ok=True)
+torch.save(model.state_dict(), "model/checkpoints/transformer.pt")
+print("✅ Model saved to model/checkpoints/transformer.pt")
+
