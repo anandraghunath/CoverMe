@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trigger</title>
+    <script>
+        function start() {
+            fetch("/start")
+                .then(res => res.json())
+                .then(data => alert(data.message));
+        }
+    </script>
+</head>
+<body>
+<button onclick="start()">Start</button>
+</body>
+</html>
