@@ -1,8 +1,11 @@
 import os
+import time
+from typing import List, Optional
 from dotenv import load_dotenv
 import google.generativeai as genai
 from transformers import pipeline
 from elevenlabs import Voice, VoiceSettings
+
 
 load_dotenv()
 gemini_api_key = os.getenv("GEMINI_API_KEY")
@@ -23,6 +26,40 @@ _eleven_voice = Voice(
     )
 )
 
+class ContextBlock:
+    def __init__(self, text: str, speaker: str = "unknown", timestamp: Optional[float] = None):
+        self.text = text.strip()
+        self.speaker = speaker
+        self.timestamp = timestamp or time.time()
+
+    def __str__(self):
+        return f"[{self.speaker} @ {time.strftime('%H:%M:%S', time.localtime(self.timestamp))}]: {self.text}"
+
+
+class ContextWindow:
+    def __init__(self, max_blocks: int = 5):
+        self.max_blocks = max_blocks
+        self.blocks: List[ContextBlock] = []
+
+    def add(self, text: str, speaker: str = "User"):
+        block = ContextBlock(text, speaker)
+        self.blocks.append(block)
+        if len(self.blocks) > self.max_blocks:
+            self.blocks.pop(0)
+
+    def get_context_as_text(self, separator: str = "\n") -> str:
+        return separator.join(str(block) for block in self.blocks)
+
+    def get_raw_text(self) -> str:
+        return " ".join(block.text for block in self.blocks)
+
+    def clear(self):
+        self.blocks = []
+
+ctx = ContextWindow(max_blocks = 2)
+
+
+        
 genai.configure(api_key=gemini_api_key)
 
 # --- Lazy Singletons ---
@@ -36,6 +73,10 @@ def get_gemini_model():
     if _gemini_model is None:
         _gemini_model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
     return _gemini_model
+
+def get_ctx():
+    global _ctx = ctx
+    return ctx
 
 
 def get_sentiment_analyzer():

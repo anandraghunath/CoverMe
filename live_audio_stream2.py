@@ -6,6 +6,8 @@ from resemblyzer import VoiceEncoder, preprocess_wav
 import whisper
 import tempfile
 import scipy.io.wavfile as wavfile
+from transcript_to_suggestions import process_transcript_segment
+import model_manager 
 
 # ==== CONFIG ====
 SAMPLE_RATE = 16000
@@ -69,6 +71,7 @@ def get_voiceprint_and_transcribe(audio_data):
     print("💬 Transcribing with Whisper...")
     result = whisper_model.transcribe(wav_path)
     print("\n🗣️ Other speaker:", result["text"])
+    process_transcript_segment(model_manager.ctx, result)
 
 def listen_and_run():
     print("🎧 Listening... Press Ctrl+C to stop.")

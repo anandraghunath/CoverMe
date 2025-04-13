@@ -1,8 +1,9 @@
 import os
 import time
 from typing import List, Optional
-from model_manager import get_gemini_model, get_sentiment_analyzer, get_emotion_analyzer
+from model_manager import ContextWindow, get_gemini_model, get_sentiment_analyzer, get_emotion_analyzer
 from text_to_speech import speak
+import model_manager
 
 # # --- Load API Key from .env ---
 # load_dotenv()
@@ -19,35 +20,35 @@ emotion_analyzer = get_emotion_analyzer()
 
 # --- Context Manager Classes ---
 
-class ContextBlock:
-    def __init__(self, text: str, speaker: str = "unknown", timestamp: Optional[float] = None):
-        self.text = text.strip()
-        self.speaker = speaker
-        self.timestamp = timestamp or time.time()
+# class ContextBlock:
+#     def __init__(self, text: str, speaker: str = "unknown", timestamp: Optional[float] = None):
+#         self.text = text.strip()
+#         self.speaker = speaker
+#         self.timestamp = timestamp or time.time()
 
-    def __str__(self):
-        return f"[{self.speaker} @ {time.strftime('%H:%M:%S', time.localtime(self.timestamp))}]: {self.text}"
+#     def __str__(self):
+#         return f"[{self.speaker} @ {time.strftime('%H:%M:%S', time.localtime(self.timestamp))}]: {self.text}"
 
 
-class ContextWindow:
-    def __init__(self, max_blocks: int = 5):
-        self.max_blocks = max_blocks
-        self.blocks: List[ContextBlock] = []
+# class ContextWindow:
+#     def __init__(self, max_blocks: int = 2):
+#         self.max_blocks = max_blocks
+#         self.blocks: List[ContextBlock] = []
 
-    def add(self, text: str, speaker: str = "User"):
-        block = ContextBlock(text, speaker)
-        self.blocks.append(block)
-        if len(self.blocks) > self.max_blocks:
-            self.blocks.pop(0)
+#     def add(self, text: str, speaker: str = "User"):
+#         block = ContextBlock(text, speaker)
+#         self.blocks.append(block)
+#         if len(self.blocks) > self.max_blocks:
+#             self.blocks.pop(0)
 
-    def get_context_as_text(self, separator: str = "\n") -> str:
-        return separator.join(str(block) for block in self.blocks)
+#     def get_context_as_text(self, separator: str = "\n") -> str:
+#         return separator.join(str(block) for block in self.blocks)
 
-    def get_raw_text(self) -> str:
-        return " ".join(block.text for block in self.blocks)
+#     def get_raw_text(self) -> str:
+#         return " ".join(block.text for block in self.blocks)
 
-    def clear(self):
-        self.blocks = []
+#     def clear(self):
+#         self.blocks = []
 
 # --- Emotion + Sentiment + Rule-Based Fallback ---
 
@@ -116,7 +117,7 @@ def process_transcript_segment(ctx: ContextWindow, new_text: str):
 # --- Example Usage --
 
 if __name__ == "__main__":
-    ctx = ContextWindow(max_blocks=5)
+    ctx = model_manager.ctx
 
     # Simulate conversation
     process_transcript_segment(ctx, "What is your previous work experience involving this software engineering position?")
