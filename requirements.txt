@@ -9,7 +9,6 @@ whisper
 sounddevice
 numpy
 scipy
-pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
-pip install librosa numpy
-pip install speechbrain==0.5.16
+librosa
+speechbrain==0.5.16
 

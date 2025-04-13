@@ -119,7 +119,7 @@ if __name__ == "__main__":
     ctx = ContextWindow(max_blocks=5)
 
     # Simulate conversation
-    process_transcript_segment(ctx, "Trump is currently president right now right?")
-    process_transcript_segment(ctx, "Who cares?")
-    process_transcript_segment(ctx, "Okay… I just wanted to know bro.")
-    process_transcript_segment(ctx, "Wanna discuss this later?")
+    process_transcript_segment(ctx, "What is your previous work experience involving this software engineering position?")
+    process_transcript_segment(ctx, "Which companies did you work at specifically?")
+    process_transcript_segment(ctx, "What skills do you possess that make you qualified for this position?")
+    process_transcript_segment(ctx, "What do you expect your salary to be as a software engineer?")
