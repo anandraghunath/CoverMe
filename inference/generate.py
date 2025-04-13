@@ -1,6 +1,7 @@
 import torch
 from model.model_def import CustomTransformer
 from tokenizers import Tokenizer
+import torch.nn.functional as F
 
 # Config
 MODEL_PATH = "model/checkpoints/transformer.pt"
@@ -26,8 +27,12 @@ def generate_reply(prompt, max_new_tokens=30):
         with torch.no_grad():
             output = model(input_tensor)
         next_token_logits = output[0, -1, :]
-        next_token_id = torch.argmax(next_token_logits).item()
-
+        probs = F.softmax(next_token_logits, dim=-1)
+        top_k = 50
+        topk_probs, topk_indices = torch.topk(probs, top_k)
+        next_token_id = topk_indices[torch.multinomial(topk_probs, 1).item()].item()
+        if next_token_id == tokenizer.token_to_id("[SEP]"):
+            break
         input_tensor = torch.cat([
             input_tensor,
             torch.tensor([[next_token_id]], dtype=torch.long).to(DEVICE)
