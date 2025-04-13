@@ -5,11 +5,16 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 from transformers import pipeline
 from elevenlabs import Voice, VoiceSettings
+import webrtcvad
+from resemblyzer import VoiceEncoder, preprocess_wav
+import whisper
 
 
 load_dotenv()
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 _eleven_api_key = os.getenv("ELEVEN_API_KEY")
+WHISPER_MODEL_NAME = "tiny.en"
+VAD_MODE = 1
 
 
 if not gemini_api_key:
@@ -67,13 +72,31 @@ _gemini_model = None
 _eleven_voice = None
 _sentiment_pipeline = None
 _emotion_pipeline = None
+_whisper_model = None 
+_encoder = None
+_vad = None
 
 def get_gemini_model():
     global _gemini_model
     if _gemini_model is None:
         _gemini_model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
     return _gemini_model
+def get_whisper_model():
+    global _whisper_model
+    if _whisper_model is None:
+        _whisper_model = whisper.load_model(WHISPER_MODEL_NAME)
+    return _whisper_model
+def get_encoder():
+    global _encoder
+    if _encoder is None:
+        _encoder = VoiceEncoder()
+    return _encoder
 
+def get_vad():
+    global _vad
+    if _vad is None:
+        _vad = webrtcvad.Vad(VAD_MODE)
+    return _vad
 
 
 def get_sentiment_analyzer():
