@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Audio Assistant</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #startBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #stopBtn {
+            background-color: #f44336;
+            color: white;
+        }
+        .conversation {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        .user {
+            background-color: #E3F2FD;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        .other {
+            background-color: #F5F5F5;
+        }
+        .ai {
+            background-color: #E8F5E9;
+        }
+        .speaker {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .manual-input {
+            display: flex;
+            gap: 10px;
+        }
+        #manualText {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #sendBtn {
+            background-color: #2196F3;
+            color: white;
+        }
+        .status {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Live Audio Assistant</h1>
+        
+        <div class="controls">
+            <button id="startBtn">Start Listening</button>
+            <button id="stopBtn" disabled>Stop Listening</button>
+        </div>
+        
+        <div class="conversation" id="conversation">
+            <!-- Conversation messages will appear here -->
+        </div>
+        
+        <div class="manual-input">
+            <input type="text" id="manualText" placeholder="Type a message...">
+            <button id="sendBtn">Send</button>
+        </div>
+        
+        <div class="status" id="status">Ready</div>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const conversation = document.getElementById('conversation');
+        const manualText = document.getElementById('manualText');
+        const sendBtn = document.getElementById('sendBtn');
+        const status = document.getElementById('status');
+        
+        let isListening = false;
+        
+        startBtn.addEventListener('click', async () => {
+            try {
+                status.textContent = 'Calibrating your voice...';
+                startBtn.disabled = true;
+                
+                const response = await fetch('/start_listening', {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    isListening = true;
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    status.textContent = 'Listening...';
+                } else {
+                    status.textContent = `Error: ${result.message}`;
+                    startBtn.disabled = false;
+                }
+            } catch (error) {
+                status.textContent = `Error: ${error.message}`;
+                startBtn.disabled = false;
+            }
+        });
+        
+        stopBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/stop_listening', {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    isListening = false;
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    status.textContent = 'Stopped listening';
+                } else {
+                    status.textContent = `Error: ${result.message}`;
+                }
+            } catch (error) {
+                status.textContent = `Error: ${error.message}`;
+            }
+        });
+        
+        sendBtn.addEventListener('click', sendManualInput);
+        manualText.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendManualInput();
+            }
+        });
+        
+        async function sendManualInput() {
+            const text = manualText.value.trim();
+            if (!text) return;
+            
+            try {
+                manualText.value = '';
+                
+                const response = await fetch('/manual_input', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status !== 'success') {
+                    status.textContent = `Error: ${result.message}`;
+                }
+            } catch (error) {
+                status.textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        // Set up event source for conversation updates
+        const eventSource = new EventSource('/stream_updates');
+        
+        eventSource.onmessage = (event) => {
+            const newMessages = JSON.parse(event.data);
+            
+            newMessages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.speaker.toLowerCase()}`;
+                
+                const speakerDiv = document.createElement('div');
+                speakerDiv.className = 'speaker';
+                speakerDiv.textContent = msg.speaker;
+                
+                const textDiv = document.createElement('div');
+                textDiv.textContent = msg.text;
+                
+                messageDiv.appendChild(speakerDiv);
+                messageDiv.appendChild(textDiv);
+                
+                conversation.appendChild(messageDiv);
+            });
+            
+            // Scroll to the bottom
+            conversation.scrollTop = conversation.scrollHeight;
+        };
+        
+        eventSource.onerror = () => {
+            status.textContent = 'Connection error. Reconnecting...';
+            // EventSource will automatically try to reconnect
+        };
+    </script>
+</body>
+</html>
+    
