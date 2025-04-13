@@ -3,7 +3,7 @@ CoverMe was created during Purdue Catapult Hackathon 2025. It is a real-time, AI
 # Tech Stack
 - Used Whisper for speech-to-text input, ElevenLabs for text-to-speech output, and Resemblyzer and WebRTC VAD to filter out your own voice using speaker recognition and silence detection for backend.
 - Employed Gemini API to generate smart suggestions and hugging face for emotion and sentiment detection.
-- Utilized React Native for frontend.
+- HTML and JavaScript for the front end.
 # Installation Process
 - Install FFmpeg
 - Install Whisper using pip install git+https://github.com/openai/whisper.git 
