@@ -1,8 +1,10 @@
 import os
-from TTS.api import TTS
+from model_manager import get_tts_model
+from elevenlabs import generate, save
+
+
 
 # Initialize the TTS model once (global)
-tts = TTS(model_name="tts_models/en/ljspeech/tacotron2-DDC", progress_bar=False)
 
 def get_next_filename(prefix="output", ext="wav", folder="."):
     """Find the next available numbered filename like output_1.wav, output_2.wav, etc."""
@@ -14,8 +16,15 @@ def get_next_filename(prefix="output", ext="wav", folder="."):
         i += 1
 
 def speak(text: str):
-    """Generate speech and save to a uniquely named WAV file."""
+    """Generate speech using ElevenLabs and save to a uniquely named WAV file."""
+    tts = get_tts_model()
     output_path = get_next_filename()
-    tts.tts_to_file(text=text, file_path=output_path)
+
+    audio = generate(
+        text=text,
+        voice=tts
+    )
+    
+    save(audio, output_path)
     print(f"[TTS] Saved speech to: {output_path}")
     return output_path
