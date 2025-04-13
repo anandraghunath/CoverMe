@@ -21,7 +21,7 @@ _emotion_pipeline = None
 def get_gemini_model():
     global _gemini_model
     if _gemini_model is None:
-        _gemini_model = genai.GenerativeModel("models/gemini-1.5-pro-latest")
+        _gemini_model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
     return _gemini_model
 
 def get_tts_model():
