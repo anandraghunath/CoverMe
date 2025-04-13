@@ -26,8 +26,8 @@ def play_wav(filepath: str):
     except Exception as e:
         print(f"❌ Could not play audio: {e}")
 
-def speak(text: str):
-    """Generate speech using ElevenLabs and save to a uniquely named WAV file."""
+def speak(text: str, speed: float = 1.3):
+    """Generate speech using ElevenLabs, adjust playback speed, and save to a WAV file."""
     tts = get_tts_model()
     output_path = get_next_filename()
 
@@ -37,11 +37,18 @@ def speak(text: str):
         voice=tts
     )
 
-    # Convert MP3 bytes to WAV using pydub
+    # Convert MP3 bytes to AudioSegment
     audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format="mp3")
-    audio.export(output_path, format="wav")
 
-    print(f"[TTS] Saved speech to: {output_path}")
+    # Speed up playback using frame rate trick
+    faster_audio = audio._spawn(audio.raw_data, overrides={
+        "frame_rate": int(audio.frame_rate * speed)
+    }).set_frame_rate(audio.frame_rate)
+
+    # Export to WAV
+    faster_audio.export(output_path, format="wav")
+
+    print(f"[TTS] Saved speech to: {output_path} (speed={speed}x)")
     play_wav(output_path)
 
     return output_path

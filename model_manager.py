@@ -42,7 +42,7 @@ class ContextBlock:
 
 
 class ContextWindow:
-    def __init__(self, max_blocks: int = 5):
+    def __init__(self, max_blocks: int = 2):
         self.max_blocks = max_blocks
         self.blocks: List[ContextBlock] = []
 
