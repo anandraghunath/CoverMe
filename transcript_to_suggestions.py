@@ -72,7 +72,7 @@ def fallback_response(emotion_label: str):
 
 # --- Gemini Suggestion Generator ---
 
-def generate_suggestion_with_gemini(context_text: str, mode: str = "Friendly") -> str:
+def generate_suggestion_with_gemini(context_text: str) -> str:
     try:
         model = genai.GenerativeModel(model_name="models/gemini-1.5-flash-latest")
         prompt = (
@@ -91,8 +91,8 @@ def generate_suggestion_with_gemini(context_text: str, mode: str = "Friendly") -
 
 # --- Master Processor ---
 
-def process_transcript_segment(ctx: ContextWindow, new_text: str, speaker: str = "Other", mode: str = "Witty"):
-    ctx.add(new_text, speaker)
+def process_transcript_segment(ctx: ContextWindow, new_text: str):
+    ctx.add(new_text)
     context_text = ctx.get_context_as_text()
     sentiment, sentiment_score, emotion, emotion_score = analyze_emotion(new_text)
 
@@ -101,14 +101,13 @@ def process_transcript_segment(ctx: ContextWindow, new_text: str, speaker: str =
         response = fallback_response(emotion)
         source = "Fallback"
     else:
-        response = generate_suggestion_with_gemini(context_text, mode)
+        response = generate_suggestion_with_gemini(context_text)
         if response:
             source = "Gemini"
         else:
             response = fallback_response(emotion)
             source = "Fallback (Gemini Failed)"
 
-    print(f"\n🎤 Speaker: {speaker}")
     print(f"\nText: {new_text}")
     print(f"🧠 Detected Sentiment: {sentiment} ({sentiment_score:.2f})")
     print(f"🎭 Detected Emotion: {emotion} ({emotion_score:.2f})")
@@ -123,7 +122,7 @@ if __name__ == "__main__":
     ctx = ContextWindow(max_blocks=5)
 
     # Simulate conversation
-    process_transcript_segment(ctx, "Trump is currently president right now right?", speaker="Other")
-    process_transcript_segment(ctx, "Who cares?", speaker="User")
-    process_transcript_segment(ctx, "Okay… I just wanted to know bro.", speaker="Other")
-    process_transcript_segment(ctx, "Wanna discuss this later?", speaker="User", mode="Friendly")
+    process_transcript_segment(ctx, "Trump is currently president right now right?")
+    process_transcript_segment(ctx, "Who cares?")
+    process_transcript_segment(ctx, "Okay… I just wanted to know bro.")
+    process_transcript_segment(ctx, "Wanna discuss this later?")
