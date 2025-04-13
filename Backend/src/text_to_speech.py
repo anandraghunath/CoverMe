@@ -26,7 +26,7 @@ def play_wav(filepath: str):
     except Exception as e:
         print(f"❌ Could not play audio: {e}")
 
-def speak(text: str, speed: float = 1.3):
+def speak(text: str, speed: float = 1.0):
     """Generate speech using ElevenLabs, adjust playback speed, and save to a WAV file."""
     tts = get_tts_model()
     output_path = get_next_filename()
