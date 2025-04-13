@@ -3,3 +3,4 @@ output_*.wav
 .env
 output.wav
 node_modules 
+__pycache__/model_manager.cpython-311.pyc

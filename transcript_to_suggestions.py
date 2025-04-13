@@ -113,7 +113,7 @@ def process_transcript_segment(ctx: ContextWindow, new_text: str):
     speak(response)
     
 
-# --- Example Usage ---
+# --- Example Usage --
 
 if __name__ == "__main__":
     ctx = ContextWindow(max_blocks=5)
