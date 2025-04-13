@@ -74,9 +74,6 @@ def get_gemini_model():
         _gemini_model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
     return _gemini_model
 
-def get_ctx():
-    global _ctx = ctx
-    return ctx
 
 
 def get_sentiment_analyzer():
