@@ -92,7 +92,7 @@ def get_tts_model():
     global _eleven_voice
     if _eleven_voice is None:
         _eleven_voice = Voice(
-            voice_id="9BWtsMINqrJLrRacOk9x",  # Replace with your preferred voice
+            voice_id="onwK4e9ZLuTAKqWW03F9",  # Replace with your preferred voice
             settings=VoiceSettings(
                 stability=0.5,
                 similarity_boost=0.75
