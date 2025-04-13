@@ -11,4 +11,8 @@ numpy
 scipy
 librosa
 speechbrain==0.5.16
+simpleaudio
+pydub
+resemblyzer
+webrtcvad
 
