@@ -1,24 +1,21 @@
 import os
 import time
 from typing import List, Optional
+from model_manager import get_gemini_model, get_sentiment_analyzer, get_emotion_analyzer
+from text_to_speech import speak
 
-import google.generativeai as genai
-from dotenv import load_dotenv
-from transformers import pipeline
-#from text_to_speech import speak
+# # --- Load API Key from .env ---
+# load_dotenv()
+# gemini_api_key = os.getenv("GEMINI_API_KEY")
 
-# --- Load API Key from .env ---
-load_dotenv()
-gemini_api_key = os.getenv("GEMINI_API_KEY")
+# if not gemini_api_key:
+#     raise Exception("GEMINI_API_KEY not found in environment variables.")
 
-if not gemini_api_key:
-    raise Exception("GEMINI_API_KEY not found in environment variables.")
+# genai.configure(api_key=gemini_api_key)
 
-genai.configure(api_key=gemini_api_key)
-
-# --- Sentiment & Emotion Analyzers ---
-sentiment_analyzer = pipeline("sentiment-analysis")
-emotion_analyzer = pipeline("text-classification", model="j-hartmann/emotion-english-distilroberta-base", top_k=1)
+# # --- Sentiment & Emotion Analyzers ---
+sentiment_analyzer = get_sentiment_analyzer()
+emotion_analyzer = get_emotion_analyzer()
 
 # --- Context Manager Classes ---
 
@@ -74,7 +71,7 @@ def fallback_response(emotion_label: str):
 
 def generate_suggestion_with_gemini(context_text: str) -> str:
     try:
-        model = genai.GenerativeModel(model_name="models/gemini-1.5-flash-latest")
+        model = get_gemini_model()
         prompt = (
             f"You are a highly adaptive conversational assistant who helps users respond "
             f"intelligently, empathetically, or playfully during real-time conversations.\n\n"
@@ -113,7 +110,7 @@ def process_transcript_segment(ctx: ContextWindow, new_text: str):
     print(f"🎭 Detected Emotion: {emotion} ({emotion_score:.2f})")
     print(f"💬 Suggestion Source: {source}")
     print(f"✅ Suggested Response: {response}")
-    #speak(response)
+    speak(response)
     
 
 # --- Example Usage ---
