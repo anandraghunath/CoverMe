@@ -7,7 +7,9 @@ import whisper
 import tempfile
 import scipy.io.wavfile as wavfile
 from transcript_to_suggestions import process_transcript_segment
-import model_manager 
+import model_manager
+from concurrent.futures import ThreadPoolExecutor
+
 
 # ==== CONFIG ====
 SAMPLE_RATE = 16000
@@ -20,12 +22,13 @@ MIN_SEGMENT_DURATION = 1.5  # seconds
 
 # ==== LOAD MODELS ====
 print("🔁 Loading models...")
-vad = webrtcvad.Vad(VAD_MODE)
-encoder = VoiceEncoder()
-whisper_model = whisper.load_model(WHISPER_MODEL_NAME)
+vad = model_manager.get_vad()
+encoder = model_manager.get_encoder()
+whisper_model = model_manager.get_whisper_model()
 
 frame_len_samples = int(SAMPLE_RATE * FRAME_DURATION / 1000)
 self_voiceprint = None
+
 
 def calibrate_self_voice():
     global self_voiceprint
