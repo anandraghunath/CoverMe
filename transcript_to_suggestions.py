@@ -74,7 +74,7 @@ def fallback_response(emotion_label: str):
 
 def generate_suggestion_with_gemini(context_text: str, mode: str = "Friendly") -> str:
     try:
-        model = genai.GenerativeModel(model_name="models/gemini-1.5-pro-latest")
+        model = genai.GenerativeModel(model_name="models/gemini-1.5-flash-latest")
         prompt = (
             f"You are a highly adaptive conversational assistant who helps users respond "
             f"intelligently, empathetically, or playfully during real-time conversations.\n\n"
