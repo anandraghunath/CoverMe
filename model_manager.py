@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 import google.generativeai as genai
 from transformers import pipeline
-from elevenlabs import set_api_key, Voice, VoiceSettings
+from elevenlabs import Voice, VoiceSettings
 
 load_dotenv()
 gemini_api_key = os.getenv("GEMINI_API_KEY")
@@ -14,7 +14,6 @@ if not gemini_api_key:
 
 if not _eleven_api_key:
     raise Exception("ELEVEN_API_KEY not found in environment variables.")
-set_api_key(_eleven_api_key)
 
 _eleven_voice = Voice(
     voice_id="Rachel",  # You can use any available voice

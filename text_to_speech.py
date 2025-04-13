@@ -2,10 +2,6 @@ import os
 from model_manager import get_tts_model
 from elevenlabs import generate, save
 
-
-
-# Initialize the TTS model once (global)
-
 def get_next_filename(prefix="output", ext="wav", folder="."):
     """Find the next available numbered filename like output_1.wav, output_2.wav, etc."""
     i = 1
